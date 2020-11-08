@@ -15,18 +15,39 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import DatePicker from "../../DatePicker/DatePicker";
 import Button from "@material-ui/core/Button";
+import GridList from "@material-ui/core/GridList";
+import GridListTile from "@material-ui/core/GridListTile";
+// import AddIcon from "@material-ui/icons/Add";
+// import { makeStyles } from '@material-ui/core/styles';
+//
+// const useStyles = makeStyles((theme) => ({
+//   root: {
+//     display: 'flex',
+//     flexWrap: 'wrap',
+//     justifyContent: 'space-around',
+//     overflow: 'hidden',
+//     backgroundColor: theme.palette.background.paper,
+//   },
+//   gridList: {
+//     width: 500,
+//     height: 450,
+//   },
+// }));
 
 Cell.propTypes = {
   currentDate: PropTypes.instanceOf(Date),
   selectedDate: PropTypes.instanceOf(Date).isRequired,
   onCellClick: PropTypes.func.isRequired,
+  events: PropTypes.array
 };
 
-function Cell({ currentDate, selectedDate, onCellClick }) {
+function Cell({ currentDate, selectedDate, onCellClick, events }) {
+  // const classes = useStyles();
   const [openModal, setOpenModal] = useState(false);
   const [pickedDate, setPickedDate] = useState(null);
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
@@ -60,9 +81,21 @@ function Cell({ currentDate, selectedDate, onCellClick }) {
         >
           <span className="number">{formattedDate}</span>
           <span className="bg">{formattedDate}</span>
-          <Button size="small" variant="outlined">
-            Small
-          </Button>
+          <GridList  cellHeight={20} cols={1}>
+            {events.map((eventData)=>(
+                <GridListTile  key={eventData.id}>
+                  {eventData.date.getTime() === cloneDay.getTime() && (
+                      <Button  onClick={()=>setOpenModal(true)} style={{justifyContent:"right"}} fullWidth size="small" color={"primary"} variant="contained">
+                        {eventData.name}
+                      </Button>)
+                  }
+                </GridListTile>
+            ))}
+          </GridList>
+          {/*<Button onClick={()=>setOpenModal(true)} style={{justifyContent:"right"}} fullWidth size="small" color={"primary"} variant="contained">*/}
+          {/*  {formattedDate}*/}
+          {/*  <AddIcon  fontSize={"small"}/>*/}
+          {/*</Button>*/}
         </div>
       );
       day = addDays(day, 1);
@@ -84,6 +117,7 @@ function Cell({ currentDate, selectedDate, onCellClick }) {
         title={"Create Event"}
         onSave={() => {
           onCellClick(pickedDate, eventName, eventDescription)
+          setOpenModal(false)
         }}
         onClose={() => setOpenModal(false)}
         open={openModal}

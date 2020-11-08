@@ -7,9 +7,10 @@ import PropTypes from "prop-types";
 
 Calendar.propTypes = {
   onCellClick: PropTypes.func.isRequired,
+  events: PropTypes.array
 };
 
-function Calendar({ onCellClick }) {
+function Calendar({ onCellClick, events }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate] = useState(new Date());
 
@@ -43,6 +44,7 @@ function Calendar({ onCellClick }) {
         </div>
         <div>
           <Cell
+              events={events}
             currentDate={currentDate}
             selectedDate={selectedDate}
             onCellClick={onCellClick}
