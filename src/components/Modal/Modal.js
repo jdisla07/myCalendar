@@ -1,6 +1,5 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import MuiDialogContent from "@material-ui/core/DialogContent";
@@ -59,12 +58,11 @@ Modal.propTypes = {
   open: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   content: PropTypes.node.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
+  actions: PropTypes.node.isRequired,
   contentText: PropTypes.string.isRequired,
 };
 
-function Modal({ open, title, content, contentText, onSave, onClose }) {
+function Modal({ open, title, content, contentText, actions }) {
   return (
     <div>
       <Dialog aria-labelledby="customized-dialog-title" open={open}>
@@ -73,24 +71,7 @@ function Modal({ open, title, content, contentText, onSave, onClose }) {
           <DialogContentText>{contentText}</DialogContentText>
           {content}
         </DialogContent>
-        <DialogActions>
-          <Button
-            autoFocus
-            onClick={onClose}
-            variant={"contained"}
-            color="default"
-          >
-            Close
-          </Button>
-          <Button
-            autoFocus
-            onClick={onSave}
-            variant={"contained"}
-            color="primary"
-          >
-            Save
-          </Button>
-        </DialogActions>
+        <DialogActions>{actions}</DialogActions>
       </Dialog>
     </div>
   );

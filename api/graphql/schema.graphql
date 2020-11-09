@@ -1,0 +1,24 @@
+scalar Date
+scalar DateTime
+type Event {
+  id: ID
+  name: String
+  description: String
+  date: Date
+}
+
+input MutationInput {
+  name: String
+  description: String
+  date: Date
+}
+
+type Query {
+  allEvents: [Event]
+  events(date: Date!): [Event]
+}
+type Mutation {
+  createEvent(input: MutationInput!): Event
+  updateEvent(id: ID!, input: MutationInput): Event
+  deleteEvent(id: ID!): Boolean
+}

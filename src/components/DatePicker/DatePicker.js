@@ -24,7 +24,7 @@ function DatePicker({ selectedDate, handleDateChange }) {
         id="date-picker-inline"
         label="Date picker inline"
         value={selectedDate}
-        onChange={handleDateChange}
+        onChange={(date) => handleDateChange(date)}
         KeyboardButtonProps={{
           "aria-label": "change date",
         }}

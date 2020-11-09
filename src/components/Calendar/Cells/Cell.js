@@ -10,43 +10,24 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import Modal from "../../Modal/Modal";
-import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
-import DatePicker from "../../DatePicker/DatePicker";
 import Button from "@material-ui/core/Button";
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
-// import AddIcon from "@material-ui/icons/Add";
-// import { makeStyles } from '@material-ui/core/styles';
-//
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     display: 'flex',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-around',
-//     overflow: 'hidden',
-//     backgroundColor: theme.palette.background.paper,
-//   },
-//   gridList: {
-//     width: 500,
-//     height: 450,
-//   },
-// }));
+import CreateEventModal from "./Assets/CreateEventModal";
+import EditEventModal from "./Assets/EditEventModal";
 
 Cell.propTypes = {
   currentDate: PropTypes.instanceOf(Date),
   selectedDate: PropTypes.instanceOf(Date).isRequired,
-  onCellClick: PropTypes.func.isRequired,
-  events: PropTypes.array
+  onSave: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func,
+  onDelete: PropTypes.func,
+  events: PropTypes.array,
 };
 
-function Cell({ currentDate, selectedDate, onCellClick, events }) {
-  // const classes = useStyles();
+function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events }) {
   const [openModal, setOpenModal] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
   const [pickedDate, setPickedDate] = useState(null);
-  const [eventName, setEventName] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
+  const [eventEdit, setEventId] = useState({});
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -69,29 +50,51 @@ function Cell({ currentDate, selectedDate, onCellClick, events }) {
           className={`column cell ${
             !isSameMonth(day, monthStart)
               ? "disabled"
-              : isSameDay(day, selectedDate)
-              ? "selected"
               : ""
           }`}
           key={day}
-          onClick={() => {
-            setOpenModal(true);
-            setPickedDate(cloneDay);
-          }}
         >
-          <span className="number">{formattedDate}</span>
-          <span className="bg">{formattedDate}</span>
-          <GridList  cellHeight={20} cols={1}>
-            {events.map((eventData)=>(
-                <GridListTile  key={eventData.id}>
-                  {eventData.date.getTime() === cloneDay.getTime() && (
-                      <Button  onClick={()=>setOpenModal(true)} style={{justifyContent:"right"}} fullWidth size="small" color={"primary"} variant="contained">
-                        {eventData.name}
-                      </Button>)
-                  }
-                </GridListTile>
+          <Button
+            onClick={() => {
+              setOpenModal(true);
+              setPickedDate(cloneDay);
+            }}
+            style={{ justifyContent: "right", height: "20%" }}
+            fullWidth
+            size="small"
+            color={`${
+              !isSameMonth(day, monthStart)
+                ? "default"
+                : isSameDay(day, selectedDate)
+                ? "primary"
+                : "secondary"
+            }`}
+            variant="contained"
+          >
+            {formattedDate}
+          </Button>
+          {/*<span className="bg">{formattedDate}</span>*/}
+          <React.Fragment>
+            {events.map((eventData) => (
+              <React.Fragment key={eventData.id}>
+                {new Date(eventData.date).getTime() === cloneDay.getTime() && (
+                  <Button
+                    onClick={() => {
+                      setOpenModalEdit(true);
+                      setEventId(eventData);
+                    }}
+                    style={{ justifyContent: "right", height: "20%" }}
+                    fullWidth
+                    size="small"
+                    color={"inherit"}
+                    variant="contained"
+                  >
+                    {eventData.name}
+                  </Button>
+                )}
+              </React.Fragment>
             ))}
-          </GridList>
+          </React.Fragment>
           {/*<Button onClick={()=>setOpenModal(true)} style={{justifyContent:"right"}} fullWidth size="small" color={"primary"} variant="contained">*/}
           {/*  {formattedDate}*/}
           {/*  <AddIcon  fontSize={"small"}/>*/}
@@ -109,51 +112,22 @@ function Cell({ currentDate, selectedDate, onCellClick, events }) {
     days = [];
   }
   return (
-    <React.Fragment>
-      <Modal
-        contentText={
-          "Create events on your calendar, please fill out the information about the event."
-        }
-        title={"Create Event"}
-        onSave={() => {
-          onCellClick(pickedDate, eventName, eventDescription)
-          setOpenModal(false)
-        }}
+    <div>
+      <CreateEventModal
         onClose={() => setOpenModal(false)}
-        open={openModal}
-        content={
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <DatePicker
-                selectedDate={pickedDate}
-                handleDateChange={(date) => setPickedDate(date)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Event name"
-                variant="outlined"
-                fullWidth={true}
-                onChange={(event)=> setEventName(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                id="outlined-multiline-static"
-                label="Description"
-                multiline
-                fullWidth
-                rows={4}
-                defaultValue=""
-                variant="outlined"
-                onChange={(event)=> setEventDescription(event.target.value)}
-              />
-            </Grid>
-          </Grid>
-        }
+        openModal={openModal}
+        onSave={onSave}
+        pickedDate={pickedDate}
+      />
+      <EditEventModal
+        onClose={() => setOpenModalEdit(false)}
+        event={eventEdit}
+        openModal={openModalEdit}
+        onSave={onUpdate}
+        onDelete={onDelete}
       />
       <div className="body">{rows}</div>
-    </React.Fragment>
+    </div>
   );
 }
 
