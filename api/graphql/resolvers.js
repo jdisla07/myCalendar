@@ -7,13 +7,13 @@ const Query = {
 };
 
 const Mutation = {
-  createEvent: async (_, { input }) => {
+  createEvent: (_, { input }) => {
     return db.create(input);
   },
-  updateEvent: async (_, { id, input }) => {
+  updateEvent: (_, { id, input }) => {
     return db.update(id, input);
   },
-  deleteEvent: async (_, { id }) => {
+  deleteEvent:  (_, { id }) => {
     return db.deleteById(id);
   },
 };
