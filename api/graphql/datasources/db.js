@@ -25,8 +25,8 @@ const findByMonth = (date) => {
   return events.filter((event) => {
     let eventDate = new Date(event.date);
     if (
-        eventDate.getFullYear() === dateToWork.getFullYear() &&
-        eventDate.getMonth() === dateToWork.getMonth()
+      eventDate.getFullYear() === dateToWork.getFullYear() &&
+      eventDate.getMonth() === dateToWork.getMonth()
     ) {
       return event;
     }

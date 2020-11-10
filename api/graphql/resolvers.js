@@ -13,7 +13,7 @@ const Mutation = {
   updateEvent: (_, { id, input }) => {
     return db.update(id, input);
   },
-  deleteEvent:  (_, { id }) => {
+  deleteEvent: (_, { id }) => {
     return db.deleteById(id);
   },
 };

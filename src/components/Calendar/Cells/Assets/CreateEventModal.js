@@ -24,7 +24,6 @@ function CreateEventModal({ openModal, onSave, onClose, pickedDate }) {
       setDisableButton(false);
     }
   };
-  console.log(dateChanged);
   return (
     <Modal
       contentText={
