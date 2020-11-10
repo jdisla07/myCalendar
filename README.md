@@ -25,4 +25,4 @@ The Agenda is available in:\
 [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The API is available in:\
-[http://localhost:3001](http://localhost:3001)
+[http://localhost:3001/graphql](http://localhost:3001/graphql)
