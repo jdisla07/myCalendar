@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { addMonths, addYears, subMonths, subYears } from "date-fns";
 import Header from "./Header/Header";
-import Day from "./WeekDays/Day";
+import WeekDays from "./WeekDays/WeekDays";
 import Cell from "./Cells/Cell";
-import PropTypes from "prop-types";
-import {useApolloClient, gql, useMutation} from "@apollo/client";
+import { useSelector, useDispatch } from "react-redux";
+import { moveToMonth, moveToYear } from "../../actions/";
+import { useApolloClient, gql, useMutation } from "@apollo/client";
+import CustomSnackBar from "../SnackBar/CustomSnackBar";
+import "./Calendar.css";
 
 const DELETE_EVENT = gql`
-  mutation deleteEvent($id:ID!){
-    deleteEvent (id: $id)
+  mutation deleteEvent($id: ID!) {
+    deleteEvent(id: $id)
   }
 `;
 
 const UPDATE_EVENT = gql`
-  mutation updateEvent($id:ID! $input:MutationInput){
-    updateEvent (id:$id input:$input){
+  mutation updateEvent($id: ID!, $input: MutationInput) {
+    updateEvent(id: $id, input: $input) {
       id
       name
       description
@@ -35,8 +37,8 @@ const GET_EVENTS = gql`
 `;
 
 const CREATE_EVENT = gql`
-  mutation createEvent($input:MutationInput!){
-    createEvent (input:$input){
+  mutation createEvent($input: MutationInput!) {
+    createEvent(input: $input) {
       id
       name
       description
@@ -45,108 +47,116 @@ const CREATE_EVENT = gql`
   }
 `;
 
-Calendar.propTypes = {
-  onCellClick: PropTypes.func.isRequired,
-};
+Calendar.propTypes = {};
 
 function Calendar() {
   const [events, setEvents] = useState([]);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const currentDate = useSelector((state) => state.dateReducer);
+  const dispatch = useDispatch();
   const [selectedDate] = useState(new Date());
-  const [trigger, setTrigger] = useState(false)
+  const [trigger, setTrigger] = useState(false);
+
   const client = useApolloClient();
-  const [createEventMutation] = useMutation(CREATE_EVENT)
-  const [updateEventMutation] = useMutation(UPDATE_EVENT)
-  const [deleteEventMutation] = useMutation(DELETE_EVENT)
+
+  const [createEventMutation] = useMutation(CREATE_EVENT);
+  const [updateEventMutation] = useMutation(UPDATE_EVENT);
+  const [deleteEventMutation] = useMutation(DELETE_EVENT);
+
   useEffect(() => {
     client
       .query({ query: GET_EVENTS, variables: { date: currentDate } })
       .then((queryResult) => {
-        setEvents(queryResult.data.events)
+        setEvents(queryResult.data.events);
       });
-  }, [currentDate, trigger]);
+  }, [client, currentDate, trigger]);
 
-  const nextMonth = () => {
-    setCurrentDate(addMonths(currentDate, 1));
+  const setYearFun = (year) => {
+    dispatch(moveToYear(year));
   };
-  const prevMonth = () => {
-    setCurrentDate(subMonths(currentDate, 1));
-  };
-  const nextYear = () => {
-    setCurrentDate(addYears(currentDate, 1));
-  };
-  const prevYear = () => {
-    setCurrentDate(subYears(currentDate, 1));
+  const setMonthFun = (month) => {
+    dispatch(moveToMonth(month));
   };
 
-  const createEvent =  (date, name, desc) => {
+  const handleSnackBar = (message) => {
+    setOpenSnackBar(true);
+    setSnackBarMessage(message);
+  };
+
+  const createEvent = (date, name, desc) => {
     createEventMutation({
       variables: {
         input: {
           name: name,
           description: desc,
-          date: date
-        }
-      }
-    }).then(r => {
-      let eventsAux = Array.from(events);
-      eventsAux.push(r.data.createEvent)
-      setEvents(eventsAux)
+          date: date,
+        },
+      },
     })
-  }
+      .then((r) => {
+        let eventsAux = Array.from(events);
+        eventsAux.push(r.data.createEvent);
+        setEvents(eventsAux);
+        handleSnackBar("Successfully created your event");
+      })
+      .catch(() => {
+        handleSnackBar("Error while creating your event");
+      });
+  };
 
-  const updateEvent =  (id, name, desc, date) => {
+  const updateEvent = (id, name, desc, date) => {
     updateEventMutation({
       variables: {
         id: id,
         input: {
           name: name,
           description: desc,
-          date: date
-        }
-      }
-    }).then(() => {
-      setTrigger(!trigger)
+          date: date,
+        },
+      },
     })
-  }
+      .then(() => {
+        setTrigger(!trigger);
+        handleSnackBar("Updated event successfully");
+      })
+      .catch(() => {
+        handleSnackBar("Error while updating your event");
+      });
+  };
 
-  const deleteEvent =  (id) => {
+  const deleteEvent = (id) => {
     deleteEventMutation({
       variables: {
         id: id,
-      }
-    }).then(() => {
-      setTrigger(!trigger)
+      },
     })
-  }
+      .then(() => {
+        setTrigger(!trigger);
+        handleSnackBar("Deleted event successfully");
+      })
+      .catch(() => {
+        handleSnackBar("Error while deleting your event");
+      });
+  };
 
   return (
-    <React.Fragment>
-      <div className="calendar">
-        <React.Fragment>
-          <Header
-            nextYear={nextYear}
-            prevYear={prevYear}
-            currentDate={currentDate}
-            nextMonth={nextMonth}
-            prevMonth={prevMonth}
-          />
-        </React.Fragment>
-        <React.Fragment>
-          <Day currentDate={currentDate} />
-        </React.Fragment>
-        <React.Fragment>
-          <Cell
-            events={events}
-            currentDate={currentDate}
-            selectedDate={selectedDate}
-            onSave={(date,name,desc)=>createEvent(date,name,desc)}
-            onUpdate={(id, name, desc,date)=> updateEvent(id, name, desc,date)}
-            onDelete={(id)=>deleteEvent(id)}
-          />
-        </React.Fragment>
-      </div>
-    </React.Fragment>
+    <div className="calendar">
+      <Header setYear={setYearFun} setMonth={setMonthFun} />
+      <WeekDays />
+      <Cell
+        events={events}
+        selectedDate={selectedDate}
+        onSave={(date, name, desc) => createEvent(date, name, desc)}
+        onUpdate={(id, name, desc, date) => updateEvent(id, name, desc, date)}
+        onDelete={(id) => deleteEvent(id)}
+      />
+      <CustomSnackBar
+        open={openSnackBar}
+        message={snackBarMessage}
+        onClose={() => setOpenSnackBar(false)}
+      />
+    </div>
   );
 }
 

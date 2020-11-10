@@ -1,12 +1,9 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { addDays, format, startOfWeek } from "date-fns";
+import { useSelector } from "react-redux";
 
-Day.propTypes = {
-  currentDate: PropTypes.object,
-};
-
-function Day({ currentDate }) {
+function WeekDays() {
+  const currentDate = useSelector((state) => state.dateReducer);
   const dateFormat = "EEE";
   const days = [];
   let startDate = startOfWeek(currentDate);
@@ -20,4 +17,4 @@ function Day({ currentDate }) {
   return <div className="days row">{days}</div>;
 }
 
-export default Day;
+export default WeekDays;

@@ -18,6 +18,7 @@ function EditEventModal({ event, onClose, onSave, onDelete, openModal }) {
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [date, setDate] = useState(null);
+  const [disableButton, setDisableButton] = useState(true);
 
   useEffect(() => {
     setEventName(event.name);
@@ -35,7 +36,10 @@ function EditEventModal({ event, onClose, onSave, onDelete, openModal }) {
           <Grid item xs={12}>
             <DatePicker
               selectedDate={new Date(date)}
-              handleDateChange={(date) => setDate(date)}
+              handleDateChange={(date) => {
+                setDate(date);
+                setDisableButton(false);
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -44,7 +48,10 @@ function EditEventModal({ event, onClose, onSave, onDelete, openModal }) {
               value={eventName}
               variant="outlined"
               fullWidth={true}
-              onChange={(event) => setEventName(event.target.value)}
+              onChange={(event) => {
+                setEventName(event.target.value);
+                setDisableButton(false);
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -56,7 +63,10 @@ function EditEventModal({ event, onClose, onSave, onDelete, openModal }) {
               fullWidth
               rows={4}
               variant="outlined"
-              onChange={(event) => setEventDescription(event.target.value)}
+              onChange={(event) => {
+                setEventDescription(event.target.value);
+                setDisableButton(false);
+              }}
             />
           </Grid>
         </Grid>
@@ -65,27 +75,31 @@ function EditEventModal({ event, onClose, onSave, onDelete, openModal }) {
         <React.Fragment>
           <Button
             autoFocus
-            onClick={() => onSave(event.id, eventName,eventDescription,date)}
+            onClick={onClose}
             variant={"contained"}
-            color="primary"
+            color="default"
           >
-            Save
+            Close
           </Button>
           <Button
             autoFocus
-            onClick={()=>onDelete(event.id)}
+            onClick={() => onDelete(event.id)}
             variant={"contained"}
             color="secondary"
           >
             Delete
           </Button>
           <Button
+            disabled={disableButton}
             autoFocus
-            onClick={onClose}
+            onClick={() => {
+              onSave(event.id, eventName, eventDescription, date);
+              setDisableButton(true);
+            }}
             variant={"contained"}
-            color="default"
+            color="primary"
           >
-            Close
+            Save
           </Button>
         </React.Fragment>
       }

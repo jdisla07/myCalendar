@@ -9,13 +9,15 @@ import {
   isSameMonth,
   startOfMonth,
   startOfWeek,
+  isWeekend,
 } from "date-fns";
 import Button from "@material-ui/core/Button";
 import CreateEventModal from "./Assets/CreateEventModal";
 import EditEventModal from "./Assets/EditEventModal";
+import "./Cell.css";
+import { useSelector } from "react-redux";
 
 Cell.propTypes = {
-  currentDate: PropTypes.instanceOf(Date),
   selectedDate: PropTypes.instanceOf(Date).isRequired,
   onSave: PropTypes.func.isRequired,
   onUpdate: PropTypes.func,
@@ -23,11 +25,12 @@ Cell.propTypes = {
   events: PropTypes.array,
 };
 
-function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events }) {
+function Cell({ selectedDate, onSave, onUpdate, onDelete, events }) {
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [pickedDate, setPickedDate] = useState(null);
   const [eventEdit, setEventId] = useState({});
+  const currentDate = useSelector((state) => state.dateReducer);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -45,13 +48,18 @@ function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events })
     for (let i = 0; i < 7; i++) {
       formattedDate = format(day, dateFormat);
       const cloneDay = day;
+      let style = {};
+      if (isWeekend(cloneDay)) {
+        style = {
+          background: "whitesmoke",
+        };
+      }
       days.push(
         <div
           className={`column cell ${
-            !isSameMonth(day, monthStart)
-              ? "disabled"
-              : ""
+            !isSameMonth(day, monthStart) ? "disabled" : ""
           }`}
+          style={style}
           key={day}
         >
           <Button
@@ -73,12 +81,12 @@ function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events })
           >
             {formattedDate}
           </Button>
-          {/*<span className="bg">{formattedDate}</span>*/}
           <React.Fragment>
             {events.map((eventData) => (
               <React.Fragment key={eventData.id}>
                 {new Date(eventData.date).getTime() === cloneDay.getTime() && (
                   <Button
+                    className="text-overflow"
                     onClick={() => {
                       setOpenModalEdit(true);
                       setEventId(eventData);
@@ -95,10 +103,6 @@ function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events })
               </React.Fragment>
             ))}
           </React.Fragment>
-          {/*<Button onClick={()=>setOpenModal(true)} style={{justifyContent:"right"}} fullWidth size="small" color={"primary"} variant="contained">*/}
-          {/*  {formattedDate}*/}
-          {/*  <AddIcon  fontSize={"small"}/>*/}
-          {/*</Button>*/}
         </div>
       );
       day = addDays(day, 1);
@@ -112,7 +116,7 @@ function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events })
     days = [];
   }
   return (
-    <div>
+    <React.Fragment>
       <CreateEventModal
         onClose={() => setOpenModal(false)}
         openModal={openModal}
@@ -127,7 +131,7 @@ function Cell({ currentDate, selectedDate, onSave, onUpdate, onDelete, events })
         onDelete={onDelete}
       />
       <div className="body">{rows}</div>
-    </div>
+    </React.Fragment>
   );
 }
 

@@ -5,7 +5,6 @@ import Grid from "@material-ui/core/Grid";
 import DatePicker from "../../../DatePicker/DatePicker";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import { gql, useMutation } from '@apollo/client';
 
 CreateEventModal.propTypes = {
   openModal: PropTypes.bool.isRequired,
@@ -15,10 +14,17 @@ CreateEventModal.propTypes = {
 };
 
 function CreateEventModal({ openModal, onSave, onClose, pickedDate }) {
-  const [eventName, setEventName] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
+  const [eventName, setEventName] = useState(null);
+  const [eventDescription, setEventDescription] = useState(null);
   const [dateChanged, setDateChanged] = useState(null);
+  const [disableButton, setDisableButton] = useState(true);
 
+  const checkFields = () => {
+    if (eventName && eventDescription) {
+      setDisableButton(false);
+    }
+  };
+  console.log(dateChanged);
   return (
     <Modal
       contentText={
@@ -36,10 +42,14 @@ function CreateEventModal({ openModal, onSave, onClose, pickedDate }) {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              required
               label="Event name"
               variant="outlined"
               fullWidth={true}
-              onChange={(event) => setEventName(event.target.value)}
+              onChange={(event) => {
+                setEventName(event.target.value);
+                checkFields();
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -47,11 +57,15 @@ function CreateEventModal({ openModal, onSave, onClose, pickedDate }) {
               id="outlined-multiline-static"
               label="Description"
               multiline
+              required
               fullWidth
               rows={4}
               defaultValue=""
               variant="outlined"
-              onChange={(event) => setEventDescription(event.target.value)}
+              onChange={(event) => {
+                setEventDescription(event.target.value);
+                checkFields();
+              }}
             />
           </Grid>
         </Grid>
@@ -68,13 +82,15 @@ function CreateEventModal({ openModal, onSave, onClose, pickedDate }) {
           </Button>
           <Button
             autoFocus
-            onClick={() =>
+            disabled={disableButton}
+            onClick={() => {
               onSave(
                 dateChanged ? dateChanged : pickedDate,
                 eventName,
                 eventDescription
-              )
-            }
+              );
+              setDisableButton(true);
+            }}
             variant={"contained"}
             color="primary"
           >

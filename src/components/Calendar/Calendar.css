@@ -1,25 +1,13 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
-@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
-
-/* GENERAL */
 * {
   box-sizing: border-box;
 }
 body {
-  font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   font-size: 1em;
   font-weight: 300;
   line-height: 0;
   position: relative;
 }
-header {
-  display: block;
-  width: 100%;
-  padding: 1.75em 0;
-  border-bottom: 1px solid lightgray;
-  background: white;
-}
-/* GRID */
+
 .row {
   margin: 0;
   padding: 0;
@@ -36,7 +24,7 @@ header {
   flex-basis: 0;
   max-width: 100%;
 }
-/* Calendar */
+
 .calendar {
   display: block;
   position: relative;
@@ -70,7 +58,6 @@ header {
   background: white;
   transition: 0.25s ease-out;
   overflow: auto;
-
 }
 .calendar .body .cell:hover {
   background: whitesmoke;
@@ -89,14 +76,14 @@ header {
 .calendar .body .cell .number {
   position: absolute;
   font-size: 82.5%;
-  line-height: 1;
   top: 0.75em;
+  line-height: 1;
   right: 0.75em;
   font-weight: 700;
 }
 
 .calendar .body .column {
-  flex-grow: 0;
   flex-basis: calc(100% / 7);
+  flex-grow: 0;
   width: calc(100% / 7);
 }

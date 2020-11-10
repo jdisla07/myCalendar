@@ -2,19 +2,19 @@ const events = [
   {
     id: "1",
     name: "Meeting 10am",
-    description: "detalles de compras",
+    description: "Listing",
     date: "Mon Nov 09 2020 00:00:00",
   },
   {
     id: "2",
-    name: "Meeting 10am",
-    description: "detalles de compras",
+    name: "Meeting 11am",
+    description: "See project details",
     date: "Sun Dec 08 2020 00:00:00",
   },
   {
     id: "3",
-    name: "Meeting 10am",
-    description: "detalles de compras",
+    name: "Meeting 12pm",
+    description: "Talk to Luis",
     date: "Tue Nov 10 2020 00:00:00",
   },
 ];
@@ -22,16 +22,15 @@ const events = [
 const findByMonth = (date) => {
   let dateToWork = new Date(date);
 
-  let eventsTo = events.filter((event) => {
+  return events.filter((event) => {
     let eventDate = new Date(event.date);
     if (
-      eventDate.getFullYear() === dateToWork.getFullYear() &&
-      eventDate.getMonth() === dateToWork.getMonth()
+        eventDate.getFullYear() === dateToWork.getFullYear() &&
+        eventDate.getMonth() === dateToWork.getMonth()
     ) {
       return event;
     }
   });
-  return eventsTo;
 };
 
 const create = (input) => {

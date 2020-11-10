@@ -1,5 +1,5 @@
 import "date-fns";
-import React from "react";
+import React, { useState } from "react";
 import DateMomentUtils from "@date-io/moment";
 import {
   MuiPickersUtilsProvider,
@@ -14,17 +14,21 @@ DatePicker.propTypes = {
 };
 
 function DatePicker({ selectedDate, handleDateChange }) {
+  const [date, setDate] = useState(selectedDate);
+
   return (
     <MuiPickersUtilsProvider utils={DateMomentUtils}>
       <KeyboardDatePicker
-        disableToolbar
         variant="inline"
         format="MMMM Do yyyy"
         margin="normal"
         id="date-picker-inline"
         label="Date picker inline"
-        value={selectedDate}
-        onChange={(date) => handleDateChange(date)}
+        value={date}
+        onChange={(date) => {
+          setDate(date);
+          handleDateChange(date.toDate());
+        }}
         KeyboardButtonProps={{
           "aria-label": "change date",
         }}
